@@ -256,8 +256,8 @@
             <label for="font-select" class="label-text">Font: </label>
             <select name="font" id="font-select">
                 <option value="hafs">Hafs</option>
-                <!-- <option value="digital-khatt">Digital Khatt</option>
-                <option value="qpc-nastaleeq">QPC Nastaleeq</option>
+                <option value="digital-khatt">Digital Khatt</option>
+                <!-- <option value="qpc-nastaleeq">QPC Nastaleeq</option>
                 <option value="test">Test</option> -->
             </select>
         </div>
@@ -290,7 +290,7 @@
         const fontSelect = document.getElementById('font-select');
         fontSelect.addEventListener('change', function() {
             document.getElementById('mushaf-display').innerHTML = '<p style="text-align: center;">Loading Quran page...</p>';
-            displayPage(currentPage);
+            fetchQuranData();
         });
 
         document.getElementById('pageInput').addEventListener('keydown', function(event) {
@@ -300,9 +300,33 @@
         });
         
         async function fetchQuranData() {
+            let fileName = '';
+            if(styleSelect.value === 'hafs') {
+                fileName += 'hafs';
+            } else if (styleSelect.value === 'hisham') {
+                fileName += 'hisham';
+            } else if (styleSelect.value === 'ibn-dhakwan') {
+                fileName += 'ibn-dhakwan';
+            }
+
+            if(fontSelect.value === 'hafs') {
+                fileName += '';
+            } else if (fontSelect.value === 'digital-khatt') {
+                if (!fileName.endsWith('-') && fileName.length > 0) fileName += '-';
+                fileName += 'digital-khatt';
+            } else if (fontSelect.value === 'qpc-nastaleeq') {
+                if (!fileName.endsWith('-') && fileName.length > 0) fileName += '-';
+                fileName += 'qpc-nastaleeq';
+            }
+
+            console.log(styleSelect.value);
+            console.log(fontSelect.value);
+            console.log(fileName);
+            
+
             try {
             // This fetches a local JSON file. If you generate it with Python, make sure it's available.
-            const response = await fetch('./quran-pages/data_'+styleSelect.value+'.json');
+            const response = await fetch('./quran-pages/data_'+fileName+'.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
