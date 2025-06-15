@@ -2,12 +2,15 @@ const puppeteer = require('puppeteer-core'); // Use puppeteer-core for serverles
 module.exports = async (req, res) => {
     let browser;
     try {
-        const chromium = await import('@sparticuz/chromium');
+        // const chromium = await import('@sparticuz/chromium');
+        const importedChromiumModule = await import('@sparticuz/chromium');
+        // This line checks if the 'default' export exists and uses it, otherwise uses the module directly.
+        const actualChromiumExports = importedChromiumModule.default || importedChromiumModule;
         browser = await puppeteer.launch({
-            args: [...chromium.args, '--hide-scrollbars', '--disable-web-security', '--disable-features=site-per-process'],
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless,
+            args: [...actualChromiumExports.args, '--hide-scrollbars', '--disable-web-security', '--disable-features=site-per-process'],
+            defaultViewport: actualChromiumExports.defaultViewport,
+            executablePath: await actualChromiumExports.executablePath(),
+            headless: actualChromiumExports.headless,
             ignoreHTTPSErrors: true,
         });
 
