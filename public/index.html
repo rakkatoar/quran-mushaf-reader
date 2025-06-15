@@ -343,7 +343,7 @@
 
             try {
             // This fetches a local JSON file. If you generate it with Python, make sure it's available.
-            const response = await fetch('./quran-pages/data_'+fileName+'.json');
+            const response = await fetch('/quran-pages/data_'+fileName+'.json');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
