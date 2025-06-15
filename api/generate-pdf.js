@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
 
         const page = await browser.newPage();
 
-        await page.goto("https://quran-mushaf-reader.netlify.app?allPages=1", { waitUntil: 'networkidle0' });
+        await page.goto("https://quran-mushaf-reader.vercel.app/?allPages=1", { waitUntil: 'networkidle0' });
 
         // Select the specific element by its ID
         const element = await page.$('#mushaf-display');
