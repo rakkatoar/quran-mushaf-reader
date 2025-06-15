@@ -3,12 +3,12 @@ let chromium;
 module.exports = async (req, res) => {
     let browser;
     try {
-        chromium = await import('@sparticuz/chromium');
+        const { executablePath, args, defaultViewport, headless } = await import('@sparticuz/chromium');
         browser = await puppeteer.launch({
-            args: chromium.args,
-            defaultViewport: chromium.defaultViewport,
-            executablePath: await chromium.executablePath(),
-            headless: chromium.headless, // Use chromium.headless
+            args: args,
+            defaultViewport: defaultViewport,
+            executablePath: await executablePath,
+            headless: headless,
             ignoreHTTPSErrors: true,
         });
 
