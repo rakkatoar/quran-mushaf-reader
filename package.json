@@ -12,7 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@sparticuz/chromium": "^123.0.1",
+    "@sparticuz/chromium": "^137.0.0",
     "adm-zip": "^0.5.16",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
