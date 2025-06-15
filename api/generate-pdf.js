@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
 
         const page = await browser.newPage();
 
-        await page.goto("https://quran-mushaf-reader.vercel.app/?allPages=1", { waitUntil: 'domcontentloaded' });
+        await page.goto("https://quran-mushaf-reader.vercel.app", { waitUntil: 'domcontentloaded' });
 
         // Select the specific element by its ID
         const element = await page.$('#mushaf-display');
