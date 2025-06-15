@@ -490,7 +490,15 @@
             
             try {
                 // Point this URL to your server-side endpoint that generates the PDF
-                const response = await fetch('/api/generate-pdf');
+                const htmlContent = document.getElementById('mushaf-display').innerHTML;
+                const response = await fetch('/api/generate-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ html: htmlContent })
+                });
+
                 
                 if (response.ok) {
                     const blob = await response.blob(); // Get the response as a Blob
