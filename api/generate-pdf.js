@@ -16,41 +16,28 @@ module.exports = async (req, res) => {
 
         const page = await browser.newPage();
 
-        await page.goto("https://quran-mushaf-reader.vercel.app", { waitUntil: 'domcontentloaded' });
+         const htmlContent = req.body && req.body.html ? req.body.html : '<h1>Error: No HTML content provided in request body.</h1>';
 
-        // Select the specific element by its ID
-        const element = await page.$('#mushaf-display');
+        // Set content directly - much faster as no external network request within the function
+        await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
 
-        if (!element) {
-            return res.status(404).send('Content div not found on the page.');
-        }
-
-        // Take a screenshot of the element
-        const imageBuffer = await element.screenshot({ type: 'png' });
-
-        // Create a PDF from the image using PDFKit
-        const PDFDocument = require('pdfkit');
-        const doc = new PDFDocument({ autoFirstPage: false });
-        let buffers = [];
-        doc.on('data', buffers.push.bind(buffers));
-        doc.on('end', () => {
-            const pdfBuffer = Buffer.concat(buffers);
-            res.set({
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': 'attachment; filename="report_from_url.pdf"',
-                'Content-Length': pdfBuffer.length
-            });
-            res.send(pdfBuffer);
+        // *** Generate PDF directly from the page ***
+        const pdfBuffer = await page.pdf({
+            format: 'A4', // Or whatever format you need
+            printBackground: true, // Important for background colors/images
+            margin: {
+                top: '20mm',
+                right: '20mm',
+                bottom: '20mm',
+                left: '20mm'
+            },
+            // Add more options for multi-page if needed (see Puppeteer docs)
+            // e.g., printBackground: true, scale: 1, preferCSSPageSize: true
         });
 
-        // Add a page with A4 size and insert the image
-        const { width, height } = await element.boundingBox();
-        // Convert px to points (1 px = 0.75 pt)
-        const pageWidth = width * 0.75;
-        const pageHeight = height * 0.75;
-        doc.addPage({ size: [pageWidth, pageHeight] });
-        doc.image(imageBuffer, 0, 0, { width: pageWidth, height: pageHeight });
-        doc.end();
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="generated_mushaf.pdf"');
+        res.send(pdfBuffer);
 
     } catch (error) {
         console.error('Error generating PDF:', error);
