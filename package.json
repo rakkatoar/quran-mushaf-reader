@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@sparticuz/chromium": "^123.0.1",
     "adm-zip": "^0.5.16",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
@@ -19,7 +20,6 @@
     "express": "^5.1.0",
     "mammoth": "^1.9.1",
     "pdfkit": "^0.17.1",
-    "@sparticuz/chromium": "^123.0.1",
     "puppeteer-core": "^24.10.1"
   }
 }
