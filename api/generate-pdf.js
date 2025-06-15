@@ -1,9 +1,9 @@
 const puppeteer = require('puppeteer-core'); // Use puppeteer-core for serverless
-const chromium = require('@sparticuz/chromium'); // For lightweight Chromium executable
-
+let chromium;
 module.exports = async (req, res) => {
     let browser;
     try {
+        chromium = await import('@sparticuz/chromium');
         browser = await puppeteer.launch({
             args: chromium.args,
             defaultViewport: chromium.defaultViewport,
