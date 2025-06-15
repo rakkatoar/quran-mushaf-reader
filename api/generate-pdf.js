@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
         browser = await puppeteer.launch({
             args: args,
             defaultViewport: defaultViewport,
-            executablePath: await executablePath,
+            executablePath: await executablePath(),
             headless: headless,
             ignoreHTTPSErrors: true,
         });
