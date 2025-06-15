@@ -1,14 +1,13 @@
 const puppeteer = require('puppeteer-core'); // Use puppeteer-core for serverless
-let chromium;
 module.exports = async (req, res) => {
     let browser;
     try {
-        const { executablePath, args, defaultViewport, headless } = await import('@sparticuz/chromium');
+        const chromium = await import('@sparticuz/chromium');
         browser = await puppeteer.launch({
-            args: args,
-            defaultViewport: defaultViewport,
-            executablePath: await executablePath(),
-            headless: headless,
+            args: [...chromium.args, '--hide-scrollbars', '--disable-web-security', '--disable-features=site-per-process'],
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(),
+            headless: chromium.headless,
             ignoreHTTPSErrors: true,
         });
 
