@@ -15,9 +15,11 @@ module.exports = async (req, res) => {
         });
 
         const page = await browser.newPage();
-
-         const htmlContent = req.body && req.body.html ? req.body.html : '<h1>Error: No HTML content provided in request body.</h1>';
-
+        console.log(req.body.html);
+        
+        const htmlContent = req.body && req.body.html ? req.body.html : '<h1>Error: No HTML content provided in request body.</h1>';
+        console.log(htmlContent);
+        
         // Set content directly - much faster as no external network request within the function
         await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
 
