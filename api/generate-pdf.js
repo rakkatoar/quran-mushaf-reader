@@ -1,5 +1,3 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
 const isVercel = process.env.VERCEL === '1';
 let actualChromiumExports; // Use puppeteer-core for serverless
 module.exports = async (req, res) => {
