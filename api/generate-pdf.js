@@ -1,15 +1,19 @@
 const isVercel = process.env.VERCEL === '1';
 let actualChromiumExports; // Use puppeteer-core for serverless
+let puppeteer; // Use puppeteer-core for serverless
 module.exports = async (req, res) => {
     let browser;
     try {
         if (isVercel) {
             // On Vercel, use @sparticuz/chromium
             const importedChromiumModule = await import('@sparticuz/chromium');
+            puppeteer = await import('@puppeteer/core');
             actualChromiumExports = importedChromiumModule.default || importedChromiumModule;
+            
         } else {
             // Locally, we don't need @sparticuz/chromium for executablePath etc.
             // Puppeteer itself will manage the browser.
+            puppeteer = await import('@puppeteer');
             actualChromiumExports = {
                 args: [],
                 executablePath: null,
