@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
         // Optionally, force viewport again (sometimes needed)
         await page.setViewport({ width: 1200, height: 1600, deviceScaleFactor: 2 });
 
-        await page.goto("http://localhost:3000/?allPages=1", { waitUntil: 'networkidle0' });
+        await page.goto("https://quran-mushaf-reader.vercel.apps/?allPages=1", { waitUntil: 'networkidle0' });
 
         // Optionally, wait for the element to resize/render
         await page.waitForSelector('#mushaf-display');
