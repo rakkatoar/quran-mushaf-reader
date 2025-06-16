@@ -7,7 +7,7 @@ module.exports = async (req, res) => {
         if (isVercel) {
             // On Vercel, use @sparticuz/chromium
             const importedChromiumModule = await import('@sparticuz/chromium');
-            puppeteer = await import('@puppeteer/core');
+            puppeteer = await import('puppeteer-core');
             actualChromiumExports = importedChromiumModule.default || importedChromiumModule;
             
         } else {
