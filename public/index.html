@@ -330,7 +330,7 @@
             } else if (styleSelect.value === 'ibn-dhakwan') {
                 fileName += 'ibn-dhakwan';
             }
-
+            
             if(fontSelect.value === 'hafs') {
                 fileName += '';
             } else if (fontSelect.value === 'digital-khatt') {
@@ -340,25 +340,29 @@
                 if (!fileName.endsWith('-') && fileName.length > 0) fileName += '-';
                 fileName += 'qpc-nastaleeq';
             }
-
-            try {
-            // This fetches a local JSON file. If you generate it with Python, make sure it's available.
-            const response = await fetch('/quran-pages/data_'+fileName+'.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            quranData = await response.json();
-            console.log('Quran data loaded successfully.');
-
+            
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('allPages') === '1') {
-                showAllPages();
-            } else {
-                displayPage(currentPage);
+            if(urlParams.get('allPages') === '1'){
+                fileName = 'all-pages';
             }
+            try {
+                // This fetches a local JSON file. If you generate it with Python, make sure it's available.
+                const response = await fetch('/quran-pages/data_'+fileName+'.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                quranData = await response.json();
+                console.log('Quran data loaded successfully.');
+
+                
+                if (urlParams.get('allPages') === '1') {
+                    showAllPages();
+                } else {
+                    displayPage(currentPage);
+                }
             } catch (error) {
-            console.error('Error fetching Quran data:', error);
-            document.getElementById('mushaf-display').innerHTML = '<p style="color: red; text-align: center;">Failed to load Quran data. Please ensure "quran-pages/data.json" is available.</p>';
+                console.error('Error fetching Quran data:', error);
+                document.getElementById('mushaf-display').innerHTML = '<p style="color: red; text-align: center;">Failed to load Quran data. Please ensure "quran-pages/data.json" is available.</p>';
             }
         }
 
