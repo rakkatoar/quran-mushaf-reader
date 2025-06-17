@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer');
-const PDFMerger = require('pdf-merger-js').default;
 const fs = require('fs');
-
-const style = 'ibn-dhakwan-digital-khatt'; // hafs / hisham / ibn-dhakwan / qpc-nastaleeq / hafs-digital-khatt / hisham-digital-khatt / ibn-dhakwan-digital-khatt
+const { PDFDocument } = require('pdf-lib');
+const path = require('node:path');
+const style = 'hafs'; // hafs / hisham / ibn-dhakwan / qpc-nastaleeq / hafs-digital-khatt / hisham-digital-khatt / ibn-dhakwan-digital-khatt
 
 generatePDF();
 async function generatePDF() {
@@ -67,28 +67,50 @@ async function generatePDF() {
                 if (browser) {
                     await browser.close();
                 }
-                // Merge all generated PDFs into a single PDF
-                const merger = new PDFMerger();
-                const dir = `./pdf/${style}`;
-                const pdfFiles = fs.readdirSync(dir)
-                    .filter(file => file.endsWith('.pdf') && file.startsWith('page-'))
-                    .sort((a, b) => {
-                        // Extract page numbers and sort numerically
-                        const numA = parseInt(a.match(/page-(\d+)\.pdf/)[1], 10);
-                        const numB = parseInt(b.match(/page-(\d+)\.pdf/)[1], 10);
-                        
-                        return numA - numB;
-                    });
-
-                for (const file of pdfFiles) {
-                    merger.add(`${dir}/${file}`);
-                }
-                
-                await merger.save(`${dir}/all-pages.pdf`);
-                console.log(`Merged PDF saved as ${dir}/all-pages.pdf`);
             }
+            const folderToMerge = `./pdf/${style}`; // Replace with the actual path to your folder
+            const outputPdfName = `${style}-all-pages.pdf`;
+            mergePdfsInFolder(folderToMerge, outputPdfName)
         }
     } catch (error) {
         console.error("Could not fetch page length from JSON:", error);
     }
+}
+
+async function mergePdfsInFolder(folderPath, outputFileName = 'all-pages.pdf') {
+  try {
+    const files = await fs.promises.readdir(folderPath);
+    const pdfFiles = files
+    .filter(file => path.extname(file).toLowerCase() === '.pdf' && file.startsWith('page-'))
+    .sort((a, b) => {
+        const numA = parseInt(a.match(/page-(\d+)\.pdf/)[1], 10);
+        const numB = parseInt(b.match(/page-(\d+)\.pdf/)[1], 10);
+        
+        return numA - numB;
+    });
+
+    if (pdfFiles.length === 0) {
+      console.log('No PDF files found in the specified folder.');
+      return;
+    }
+
+    const mergedPdf = await PDFDocument.create();
+
+    for (const pdfFile of pdfFiles) {
+        const pdfFilePath = path.join(folderPath, pdfFile);
+        const pdfBytes = await fs.promises.readFile(pdfFilePath);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
+
+        const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+        copiedPages.forEach((page) => mergedPdf.addPage(page));
+    }
+
+    const mergedPdfBytes = await mergedPdf.save();
+    const outputPath = path.join(folderPath, outputFileName);
+    await fs.promises.writeFile(outputPath, mergedPdfBytes);
+
+    console.log(`Successfully merged ${pdfFiles.length} PDF files into: ${outputPath}`);
+  } catch (error) {
+    console.error('An error occurred:', error.message);
+  }
 }
