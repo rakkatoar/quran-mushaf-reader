@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { PDFDocument } = require('pdf-lib');
 const path = require('node:path');
-const style = 'hafs'; // hafs / hisham / ibn-dhakwan / qpc-nastaleeq / hafs-digital-khatt / hisham-digital-khatt / ibn-dhakwan-digital-khatt
+const style = 'hisham'; // hafs / hisham / ibn-dhakwan / qpc-nastaleeq / hafs-digital-khatt / hisham-digital-khatt / ibn-dhakwan-digital-khatt
 
 generatePDF();
 async function generatePDF() {
@@ -103,6 +103,7 @@ async function mergePdfsInFolder(folderPath, outputFileName = 'all-pages.pdf') {
 
         const copiedPages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
         copiedPages.forEach((page) => mergedPdf.addPage(page));
+        await fs.promises.unlink(pdfFilePath);
     }
 
     const mergedPdfBytes = await mergedPdf.save();
