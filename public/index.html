@@ -155,11 +155,12 @@
         #mushaf-display {
             width: min-content;
             margin: auto;
-            margin-bottom: 4rem;
             direction: rtl; /* Essential for Arabic text */
             text-align: justify; /* Helps align Arabic text cleanly */
             line-height: 1.85; /* Adjust font size for readability */
             border-radius: 12px;
+            margin-left: auto;
+            margin-right: 0;
         }
 
         #mushaf-display .ayah{
@@ -240,6 +241,25 @@
             color: black !important;
             border: 1px solid #ddd !important;
         }
+        @media screen and (max-width: 768px) {
+            .content-wrapper{
+                flex-direction: column;
+                align-items: center;
+            }
+        }    
+        .content-wrapper{
+            display: flex;
+            margin: auto;
+            width: min-content;
+            margin-bottom: 4rem;
+        }
+        #notes-list {
+            padding: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
@@ -281,8 +301,11 @@
         </div>
     </div>
 
-    <div id="mushaf-display">
-        <p style="text-align: center;">Loading Quran page...</p>
+    <div class="content-wrapper">
+        <div id="mushaf-display">
+            <p style="text-align: center;">Loading Quran page...</p>
+        </div>
+        <ul id="notes-list"></ul>
     </div>
 
     <script>
@@ -373,13 +396,20 @@
             const title = document.getElementById('title');
 
             if(fontSelect.value === 'qpc-nastaleeq'){
-            document.body.style.fontFamily = 'qpc-nastaleeq';
+                document.body.style.fontFamily = 'qpc-nastaleeq';
             } else if (fontSelect.value === 'digital-khatt'){
-            document.body.style.fontFamily = 'digitalkhatt';
+                document.body.style.fontFamily = 'digitalkhatt';
             } else {
-            document.body.style.fontFamily = 'me_quran';
+                document.body.style.fontFamily = 'me_quran';
             }
 
+            
+            const notesDisplay = document.getElementById('notes-list');
+            notesDisplay.innerHTML = ''; // Clear previous notes
+            if(quranData.pages[pageNumber].notes_content){
+                notesDisplay.innerHTML = quranData.pages[pageNumber].notes_content;
+            }
+            
             // Set the HTML content for the selected page
             mushafDisplay.innerHTML = quranData.pages[pageNumber].html_content;
             currentPage = pageNumber;

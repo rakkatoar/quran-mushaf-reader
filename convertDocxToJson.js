@@ -113,13 +113,14 @@ function mappingData(groupedByPage) {
     const promises = []; // Array to hold all the promises
 
     for (let i = 1; i <= totalPages; i++) {
-        // if (i === 564) { // Removed the conditional
+        // if (i === 552) { // Removed the conditional
             const docxFilePath = path.join(__dirname, 'quran-styles/'+style, `${i}.docx`);
             const promise = docxToJson(docxFilePath)
                 .then(jsonResult => {
                     const generatedHtml = generateQuranHTML(jsonResult.page, groupedByPage[i]);
                     quranPagesData[i] = {
-                        html_content: generatedHtml
+                        html_content: generatedHtml.content,
+                        notes_content: generatedHtml.notes
                     };
                 })
                 .catch(err => 
@@ -148,7 +149,7 @@ async function docxToJson(filePath) {
     try {
         const result = await mammoth.convertToHtml({ path: filePath }, {
             transformDocument: j => {
-                j.children.forEach((k) => {
+                j.children.forEach(k => {
                     k.children.forEach(l => {
                         if (l.type === "run" && l.children) {
                             l.children.forEach(m => {
@@ -198,9 +199,11 @@ async function docxToJson(filePath) {
 }
 
 function generateQuranHTML(textLines, lineMetadata) {
-  let htmlOutput = '';
+  let contentHtmlOutput = '';
   let textLineIndex = 0; // To keep track of which textLine we're on
   let testNumber = 1;
+  let notesHtmlOutput = '';
+  
   for (let i = 0; i < lineMetadata.length; i++) {
     const metadata = lineMetadata[i];
     const isCenteredClass = metadata.is_centered === '1' ? 'text-center flex justify-center' : 'flex justify-between';
@@ -208,7 +211,7 @@ function generateQuranHTML(textLines, lineMetadata) {
     if (metadata.line_type === 'surah_name') {
         const surahNumber = metadata.surah_number;
         const paddedSurahNumber = String(surahNumber).padStart(3, '0');
-        htmlOutput += `
+        contentHtmlOutput += `
             <div class='surah-name'>
                 <div class='quran-icon surah-header ${isCenteredClass}'>header</div>
                 <div class='surah-icon ${isCenteredClass}'>
@@ -260,9 +263,9 @@ function generateQuranHTML(textLines, lineMetadata) {
             }
         }).join('');
 
-        htmlOutput += `
+        contentHtmlOutput += `
                 <p class='quran-line ${isCenteredClass}'
-                        data-page='${metadata.page_number}'
+                        data-pag='${metadata.page_number}'
                         data-line='${metadata.line_number}'
                         data-first-word-id='${firstWordId}'
                         data-last-word-id='${lastWordId}'
@@ -275,8 +278,28 @@ function generateQuranHTML(textLines, lineMetadata) {
         console.warn(`Warning: No text found for metadata line ${metadata.line_number}`);
       }
     } else if (metadata.line_type === 'basmallah'){
-        htmlOutput += `<div class='bismillah ${isCenteredClass}'> ﷽</div>`;
+        contentHtmlOutput += `<div class='bismillah ${isCenteredClass}'> ﷽</div>`;
     }
   }
-  return htmlOutput;
+  
+  if(textLines.length > textLineIndex){
+      for (let i = textLineIndex; i < textLines.length; i++) {
+        
+        if(!textLines[i].text.toLowerCase().includes('note')){
+            if (textLines[i].text.includes('[') && textLines[i].text.includes('~')) {
+                const highlightMatches = [...textLines[i].text.matchAll(/~(.*?)~\[(.*?)\]/g)];
+                if (highlightMatches.length > 0) {
+                    highlightMatches.forEach(match => {
+                        const highlightColor = match[1];
+                        const highlightText = match[2];
+                        notesHtmlOutput += `<li class='notes' style="color: ${highlightColor};">${highlightText}</li>`;
+                    });
+                }
+            } else {
+                notesHtmlOutput += `<li class='notes'>${textLines[i].text}</li>`;
+            }
+        }
+      }
+  }
+return { content: contentHtmlOutput, notes: notesHtmlOutput };
 }
