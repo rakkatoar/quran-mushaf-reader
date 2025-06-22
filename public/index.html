@@ -144,7 +144,7 @@
             height: min-content;
             margin: auto;
             padding: 24px;
-            border: 20px solid transparent;
+            border: 28px solid transparent;
             border-image-source: url(borders/quran-border.png);
             border-image-slice: 172 fill;
             border-image-repeat: round;
@@ -178,10 +178,6 @@
         #mushaf-display .word .text:hover, #mushaf-display .arabic-num-marker:hover{
             color: #46ac71;
             border-bottom: 1px solid black;
-        }
-
-        #mushaf-display p{
-            font-size: clamp(10px, 2.2vw, 29.9px);
         }
 
         .quran-page{
@@ -252,6 +248,8 @@
             margin: auto;
             width: min-content;
             margin-bottom: 4rem;
+            gap:1rem;
+            font-size: clamp(10px, 2.2vw, 29.9px);
         }
         #notes-list {
             padding: 0;
@@ -259,6 +257,10 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            gap: 1rem;
+        }
+        .content-wrapper .content{
+            background-color: #f8f0da;
         }
     </style>
 </head>
@@ -405,13 +407,17 @@
 
             
             const notesDisplay = document.getElementById('notes-list');
-            notesDisplay.innerHTML = ''; // Clear previous notes
+            notesDisplay.innerHTML = '';
+
             if(quranData.pages[pageNumber].notes_content){
                 notesDisplay.innerHTML = quranData.pages[pageNumber].notes_content;
+                notesDisplay.style.display = 'flex';
+            } else {
+                notesDisplay.style.display = 'none';
             }
             
             // Set the HTML content for the selected page
-            mushafDisplay.innerHTML = quranData.pages[pageNumber].html_content;
+            mushafDisplay.innerHTML = `<div class="content">${quranData.pages[pageNumber].html_content}</div>`;
             currentPage = pageNumber;
             currentPageInfo.textContent = `Page: ${currentPage}`;
             pageInput.value = currentPage; // Update input field
