@@ -258,6 +258,13 @@
             flex-direction: column;
             justify-content: center;
             gap: 1rem;
+            width:max-content;
+        }
+        #notes-list li{
+            word-spacing: 4px;
+        }
+        #notes-list li span {
+            margin: 0 2px;
         }
         .content-wrapper .content{
             background-color: #f8f0da;
@@ -313,6 +320,7 @@
     <script>
         let quranData = null; // Will store the parsed JSON data
         let currentPage = 1;
+        let isDarkMode = false;
         const styleSelect = document.getElementById('style-select');
         styleSelect.addEventListener('change', function() {
             document.getElementById('mushaf-display').innerHTML = '<p style="text-align: center;">Loading Quran page...</p>';
@@ -432,6 +440,9 @@
             mushafDisplay.classList.add('quran-page');
             mushafDisplay.scrollTop = 0; // Scroll to top of the display area
 
+            const content = document.getElementsByClassName('content')[0];
+            content.style.backgroundColor = isDarkMode ? '#222' : '#f8f0da';
+
             mushafDisplay.querySelectorAll('.word').forEach(element => {
             element.addEventListener('mouseover', function() {
                 const className = this.className;
@@ -550,16 +561,19 @@
             const mushafDisplay = document.getElementById('mushaf-display');
             mushafDisplay.classList.toggle('dark-mode');
             const btn = document.getElementById('darkModeToggleBtn');
-            
-            if (mushafDisplay.classList.contains('dark-mode')) {
+            const content = document.getElementsByClassName('content')[0];
+            isDarkMode = !isDarkMode;
+            if (isDarkMode) {
                 btn.textContent = 'Light Mode';
                 mushafDisplay.style.backgroundColor = '#222';
+                content.style.backgroundColor = '#222';
                 mushafDisplay.style.color = '#eee';
                 btn.classList.remove('dark-mode-btn');
                 btn.classList.add('light-mode-btn');
             } else {
                 btn.textContent = 'Dark Mode';
                 mushafDisplay.style.backgroundColor = '#f8f0da';
+                content.style.backgroundColor = '#f8f0da';
                 mushafDisplay.style.color = '#333';
                 btn.classList.remove('light-mode-btn');
                 btn.classList.add('dark-mode-btn');

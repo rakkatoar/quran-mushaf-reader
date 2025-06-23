@@ -7,7 +7,7 @@ const AdmZip = require('adm-zip');
 
 const isDebugging = true;
 
-const style = 'ibn-dhakwan'; // hafs / hisham / ibn-dhakwan / qpc-nastaleeq / hafs-digital-khatt / hisham-digital-khatt / ibn-dhakwan-digital-khatt
+const style = 'hisham'; // hafs / hisham / ibn-dhakwan / qpc-nastaleeq / hafs-digital-khatt / hisham-digital-khatt / ibn-dhakwan-digital-khatt
 async function csvFileToJson(filePath, delimiter = ',') {
     return new Promise((resolve, reject) => {
         const records = [];
@@ -113,7 +113,7 @@ function mappingData(groupedByPage) {
     const promises = []; // Array to hold all the promises
 
     for (let i = 1; i <= totalPages; i++) {
-        // if (i === 552) { // Removed the conditional
+        // if (i === 584) { // Removed the conditional
             const docxFilePath = path.join(__dirname, 'quran-styles/'+style, `${i}.docx`);
             const promise = docxToJson(docxFilePath)
                 .then(jsonResult => {
@@ -149,10 +149,29 @@ async function docxToJson(filePath) {
     try {
         const result = await mammoth.convertToHtml({ path: filePath }, {
             transformDocument: j => {
-                j.children.forEach(k => {
-                    k.children.forEach(l => {
+                let notesIndex = -1;
+                let combinedTextIndex = -1;
+                j.children.forEach((k, kIdx) => {
+                    let combinedText = '';
+                    k.children.forEach((l, lIdx) => {
                         if (l.type === "run" && l.children) {
                             l.children.forEach(m => {
+                                if(notesIndex > -1){
+                                    let existingText = '';
+                                    if(l.highlight && m.value && m.value.trim() && /[\w\d\u0600-\u06FF]/.test(m.value)){
+                                        existingText = `~${l.highlight}~[${m.value}]`;
+                                    }
+                                    combinedText += existingText !== '' ? existingText : m.value;
+                                    if(combinedTextIndex === -1){
+                                        combinedTextIndex = lIdx;
+                                    } else {
+                                        j.children[kIdx].children[combinedTextIndex].children[0].value = combinedText;
+                                        m.value = '';
+                                    }
+                                }
+                                if(m.value.toLowerCase().includes('note')){
+                                    notesIndex = kIdx;
+                                }
                                 if(l.highlight && m.value && m.value.trim() && /[\w\d\u0600-\u06FF]/.test(m.value)){
                                     m.value = `~${l.highlight}~[${m.value}]`;
                                 }
@@ -286,14 +305,29 @@ function generateQuranHTML(textLines, lineMetadata) {
       for (let i = textLineIndex; i < textLines.length; i++) {
         
         if(!textLines[i].text.toLowerCase().includes('note')){
+            
             if (textLines[i].text.includes('[') && textLines[i].text.includes('~')) {
-                const highlightMatches = [...textLines[i].text.matchAll(/~(.*?)~\[(.*?)\]/g)];
+                let noteText = textLines[i].text;
+                const highlightMatches = [...noteText.matchAll(/~(.*?)~\[(.*?)\]/g)];
                 if (highlightMatches.length > 0) {
-                    highlightMatches.forEach(match => {
+                    let combinedNote = '';
+                    let currentIndex = 0;
+                    highlightMatches.forEach((match) => {
+                        // Add any plain text before this match
+                        if (match.index > currentIndex) {
+                            const plainText = noteText.substring(currentIndex, match.index);
+                            combinedNote += plainText;
+                        }
                         const highlightColor = match[1];
                         const highlightText = match[2];
-                        notesHtmlOutput += `<li class='notes' style="color: ${highlightColor};">${highlightText}</li>`;
+                        combinedNote += `<span style="color: ${highlightColor};">${highlightText}</span>`;
+                        currentIndex = match.index + match[0].length;
                     });
+                    // Add any remaining plain text after the last match
+                    if (currentIndex < noteText.length) {
+                        combinedNote += noteText.substring(currentIndex);
+                    }
+                    notesHtmlOutput += `<li class='notes'>${combinedNote.trim()}</li>`;
                 }
             } else {
                 notesHtmlOutput += `<li class='notes'>${textLines[i].text}</li>`;
