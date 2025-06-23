@@ -330,6 +330,14 @@
             loadPage();
             }
         });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changePage(-1);
+            } else if (event.key === 'ArrowRight') {
+                changePage(1);
+            }
+        });
         
         async function fetchQuranData() {
             const urlParams = new URLSearchParams(window.location.search);
