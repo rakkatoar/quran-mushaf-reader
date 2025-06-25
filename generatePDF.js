@@ -39,7 +39,7 @@ async function generatePDF() {
         
                     
                     // Select the specific element by its ID
-                    const element = await page.$('#mushaf-display');
+                    const element = await page.$('#content-wrapper');
         
                     if (!element) {
                         console.error('Content div not found on the page.');

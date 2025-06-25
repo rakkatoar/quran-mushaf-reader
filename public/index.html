@@ -238,18 +238,19 @@
             border: 1px solid #ddd !important;
         }
         @media screen and (max-width: 768px) {
-            .content-wrapper{
+            #content-wrapper{
                 flex-direction: column;
                 align-items: center;
             }
         }    
-        .content-wrapper{
+        #content-wrapper{
             display: flex;
             margin: auto;
             width: min-content;
             margin-bottom: 4rem;
             gap:1rem;
             font-size: clamp(10px, 2.2vw, 29.9px);
+            padding-right: 1rem;
         }
         #notes-list {
             padding: 0;
@@ -272,7 +273,7 @@
         #notes-list li span {
             margin: 0 2px;
         }
-        .content-wrapper .content{
+        #content-wrapper .content{
             background-color: #f8f0da;
         }
     </style>
@@ -316,7 +317,7 @@
         </div>
     </div>
 
-    <div class="content-wrapper">
+    <div id="content-wrapper">
         <div id="mushaf-display">
             <p style="text-align: center;">Loading Quran page...</p>
         </div>
